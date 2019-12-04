@@ -9,7 +9,7 @@ import android.os.HandlerThread
 import android.util.AttributeSet
 import android.util.Size
 import android.view.TextureView
-import com.sunxy.test.test_camera2.ImageUtils
+import com.sunxy.suntensorflowtest.utils.ImageUtils
 import java.io.IOException
 
 class CameraTextureView @JvmOverloads

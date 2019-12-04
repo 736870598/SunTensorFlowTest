@@ -14,7 +14,6 @@ import android.util.Size
 import android.view.Surface
 import android.view.TextureView
 import androidx.annotation.WorkerThread
-import com.sunxy.test.test_camera2.ImageUtils
 
 class Camera2Helper(private val context: Context,
                     private val textureView: TextureView,
@@ -105,7 +104,7 @@ class Camera2Helper(private val context: Context,
      */
     private fun openCamera(isFront: Boolean) {
         val cameraInfo = if (isFront) frontCameraInfo else backCameraInfo
-        initListener?.initComplete(cameraInfo.cameraSize!!.height, cameraInfo.cameraSize!!.width, cameraInfo.cameraOri)
+        initListener?.initComplete(cameraInfo)
 
         //打开摄像头。
         if (cameraInfo.cameraId != "") {
@@ -176,12 +175,36 @@ class Camera2Helper(private val context: Context,
             var characteristics = cameraManager.getCameraCharacteristics(frontCameraInfo.cameraId)
             var map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
             frontCameraInfo.cameraYUV = map?.isOutputSupportedFor(imageFormat) == true
-            frontCameraInfo.cameraSize = ImageUtils.getOptimalSize(map!!.getOutputSizes(SurfaceTexture::class.java), height, width)
+            if (backCameraInfo.cameraOri / 90 % 2 == 0){
+                frontCameraInfo.cameraSize = ImageUtils.getOptimalSize(
+                    map!!.getOutputSizes(SurfaceTexture::class.java),
+                    width/2,
+                    height/2
+                )
+            }else{
+                frontCameraInfo.cameraSize = ImageUtils.getOptimalSize(
+                    map!!.getOutputSizes(SurfaceTexture::class.java),
+                    height/2,
+                    width/2
+                )
+            }
 
             characteristics = cameraManager.getCameraCharacteristics(backCameraInfo.cameraId)
             map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
             backCameraInfo.cameraYUV = map?.isOutputSupportedFor(imageFormat) == true
-            backCameraInfo.cameraSize = ImageUtils.getOptimalSize(map!!.getOutputSizes(SurfaceTexture::class.java), height, width)
+            if (backCameraInfo.cameraOri / 90 % 2 == 0){
+                backCameraInfo.cameraSize = ImageUtils.getOptimalSize(
+                    map!!.getOutputSizes(SurfaceTexture::class.java),
+                    width/2,
+                    height/2
+                )
+            }else{
+                backCameraInfo.cameraSize = ImageUtils.getOptimalSize(
+                    map!!.getOutputSizes(SurfaceTexture::class.java),
+                    height/2,
+                    width/2
+                )
+            }
 
             //打开摄像头。
             openCamera(isFrontCamera)
@@ -276,7 +299,11 @@ class Camera2Helper(private val context: Context,
             val image = imageReader.acquireNextImage()
             if (captureListener != null){
                 val cameraInfo = if (isFrontCamera) frontCameraInfo else backCameraInfo
-                val bmp = ImageUtils.getBmpFromImage(image.planes, cameraInfo.cameraSize!!.width, cameraInfo.cameraSize!!.height)
+                val bmp = ImageUtils.getBmpFromImage(
+                    image.planes,
+                    cameraInfo.cameraSize!!.width,
+                    cameraInfo.cameraSize!!.height
+                )
                 captureListener?.captureSuccess(bmp!!, cameraInfo.cameraOri)
                 captureListener = null
             }else if (previewListener != null){
@@ -287,7 +314,7 @@ class Camera2Helper(private val context: Context,
     }
 
     interface OnInitCompleteListener{
-        fun initComplete(width: Int, height: Int, orientation: Int)
+        fun initComplete(cameraInfo: CameraInfo)
     }
 
     interface OnPreviewDataListener{

@@ -51,15 +51,6 @@ class Camera2Activity: AppCompatActivity(), Camera2Helper.OnCaptureListener, Han
     override fun captureSuccess(bmp: Bitmap, orientation: Int) {
         Log.v("sunxy-----", "bmp: $bmp, orientation: $orientation")
         dealHandler.obtainMessage(orientation, bmp).sendToTarget()
-//        val resultList = classifier.recognizeImage(bmp, orientation)
-//        runOnUiThread {
-//            textView.text = ""
-//            for (recognition in resultList) {
-//                textView.append(recognition.toString())
-//                textView.append("\n")
-//                textureView.capture(this)
-//            }
-//        }
     }
 
     override fun handleMessage(msg: Message): Boolean {

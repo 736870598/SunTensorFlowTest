@@ -2,6 +2,7 @@ package com.sunxy.suntensorflowtest.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.TextureView
 import com.sunxy.suntensorflowtest.utils.Camera2Helper
 
@@ -12,10 +13,15 @@ class AutoFitTextureView @JvmOverloads constructor(context: Context, attributeSe
     private var ratioWidth = 0
     private var ratioHeight = 0
 
-    private val camera2Helper by lazy { Camera2Helper(getContext(), this, null) }
+    private val camera2Helper by lazy { Camera2Helper(getContext(), this, this) }
 
-    override fun initComplete(width: Int, height: Int, orientation: Int) {
-        setAspectRatio(width, height)
+    override fun initComplete(cameraInfo: Camera2Helper.CameraInfo) {
+        Log.v("sunxy-----", "cameraInfo: $cameraInfo")
+        if (cameraInfo.cameraOri / 90 % 2 == 0){
+            setAspectRatio(cameraInfo.cameraSize!!.width, cameraInfo.cameraSize!!.height)
+        }else{
+            setAspectRatio(cameraInfo.cameraSize!!.height, cameraInfo.cameraSize!!.width)
+        }
     }
 
     fun onResume(){
@@ -49,7 +55,8 @@ class AutoFitTextureView @JvmOverloads constructor(context: Context, attributeSe
         if (0 == ratioWidth || 0 == ratioHeight) {
             setMeasuredDimension(width, height)
         }else{
-            setMeasuredDimension(width, width * ratioHeight / ratioWidth)
+            setMeasuredDimension(ratioWidth, ratioHeight)
+//            setMeasuredDimension(width, width * ratioHeight / ratioWidth)
         }
     }
 }

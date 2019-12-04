@@ -1,9 +1,8 @@
-package com.sunxy.test.test_camera2
+package com.sunxy.suntensorflowtest.utils
 
 import android.graphics.Bitmap
 import android.media.Image
 import android.util.Size
-import kotlin.math.abs
 
 object ImageUtils{
 
@@ -12,29 +11,21 @@ object ImageUtils{
      * 获取最符合要求大小的size
      */
     fun getOptimalSize(supportedSizes: Array<Size?>, width: Int, height: Int): Size?{
-        var minW = Integer.MAX_VALUE
-        var minWSize: Size? = null
-        //找一个宽高最接近的尺寸。
-        supportedSizes
-                .map {
-                    val diff = abs(it!!.width - width/2)
-                    if (diff < minW){
-                        minW = diff
-                        minWSize = it
-                    }
-                }
-
-        var minH = Integer.MAX_VALUE
-        var fixSize: Size? = null
-        supportedSizes
-                .filter { it!!.width == minWSize!!.width }
-                .map {
-                    val diff = abs(it!!.height - height/2)
-                    if (diff < minH){
-                        minH = diff
-                        fixSize = it
-                    }
-                }
+        var fixSize = supportedSizes[0]
+        var minDiff = Integer.MAX_VALUE
+        for (size in supportedSizes) {
+            if (size == null){
+                continue
+            }
+            if (size.width > width || size.height > height){
+                continue
+            }
+            val diff = width - size.width + (height - size.height)
+            if (diff < minDiff){
+                minDiff = diff
+                fixSize = size
+            }
+        }
         return fixSize
     }
 
